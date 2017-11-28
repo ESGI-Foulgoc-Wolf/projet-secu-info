@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1511885288 source:d:\cours esgi\2e année\sécurité informatique\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
