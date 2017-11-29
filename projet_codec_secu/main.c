@@ -1,3 +1,5 @@
+/* But du programme : cryptage/décryptage d'un fichier selon une matrice
+    auteurs : FOULGOC Medhi, WOLF Hugo*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +56,7 @@ int main(int argc, char **argv){
     return 0;
 }
 
+//fonction permettant de récupérer la matrice entrée par l'utilisateur, et de vérifier si elle correspond au format voulu
 void get_matrix(char *matrix, int *column_nb, int *line_nb, int *valid_matrix){
     FILE *matrix_fp;
     char filecontent[1000];
@@ -61,7 +64,7 @@ void get_matrix(char *matrix, int *column_nb, int *line_nb, int *valid_matrix){
     int start = 0;
     int i = 0;
 
-    printf("\nVeuillez entrez le nom ou le chemin du fichier : ");
+    printf("\nVeuillez entrer le nom ou le chemin du fichier : ");
     fflush(stdin);
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
@@ -90,11 +93,12 @@ void get_matrix(char *matrix, int *column_nb, int *line_nb, int *valid_matrix){
     }
 }
 
+//fonction permettant de récupérer le fichier entré par l'utilisateur
 void get_message(char *message, int *valid_message){
     FILE *message_fp;
     char filename[1000];
 
-    printf("\nVeuillez entrez le nom ou le chemin du fichier : ");
+    printf("\nVeuillez entrer le nom ou le chemin du fichier : ");
     fflush(stdin);
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
@@ -108,7 +112,7 @@ void get_message(char *message, int *valid_message){
     }
 }
 
-
+//fonction permettant de crypter le fichier
 void hash_message(char *message, char *matrix, int column_nb, int line_nb){
     FILE *finalfp;
     int *binary= NULL;
@@ -118,6 +122,7 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
     char filename[1000];
     int i = 0, j = 0, k = 0, l = 0;
 
+    //transfert du code binaire des chars dans un tableau
     for(i = 0; i < strlen(message); i++){
         for(j = 7; j >= 0; j--){
             binary_message[(8 * i) + (7-j)]=((1 << j) & message[i]) >> j;
@@ -126,6 +131,7 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
 
     binary = malloc(column_nb*sizeof(int));
 
+    //cryptage du code binaire
     for(i = 0; i < strlen(message)*8/line_nb; i++){
         for(j = 0; j < column_nb; j++){
             binary[j]=0;
@@ -145,6 +151,7 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
 
     free(binary);
 
+    //reconversion du message crypté en chars
     for(i = 0; i < strlen(message)*8/line_nb; i++){
         for(j = 0; j < 8; j++){
             final_message[i]=final_message[i]^crypted_message[j+8*i];
@@ -152,7 +159,8 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
         }
     }
 
-    printf("\nVeuillez entrez le nom du fichier a creer : ");
+    //création du nouveau fichier
+    printf("\nVeuillez entrer le nom du fichier a creer : ");
     fflush(stdin);
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
@@ -162,7 +170,7 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
     fclose(finalfp);
 }
 
-
+//fonction permettant de décrypter le fichier
 void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
     FILE *finalfp;
     int *newbinary= NULL;
@@ -172,6 +180,7 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
     char filename[1000];
     int i = 0, j = 0, k = 0, l = 0, m = 0;
 
+    //transfert du code binaire des chars dans un tableau
     for(i = 0; i < strlen(message); i++){
         for(j = 7; j >= 0; j--){
             binary_message[(8 * i) + (7-j)]=((1 << j) & message[i]) >> j;
@@ -179,6 +188,7 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
     }
 
     newbinary = malloc(column_nb*sizeof(int));
+    //décryptage du code binaire
     do{
         newbinary[l] = binary_message[k+4];
         l++;
@@ -196,6 +206,7 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
             decrypted_message[j]=newbinary[j];
     }
 
+    //reconversion du message crypté en chars
     for(i = 0; i < column_nb*8/line_nb; i++){
         m = i;
         for(j = 0; j < 8; j++){
@@ -204,7 +215,8 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
         }
     }
 
-    printf("\nVeuillez entrez le nom du fichier a creer : ");
+    //création du nouveau fichier
+    printf("\nVeuillez entrer le nom du fichier a creer : ");
     fflush(stdin);
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
