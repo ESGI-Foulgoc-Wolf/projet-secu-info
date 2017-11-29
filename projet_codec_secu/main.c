@@ -226,11 +226,8 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
     fflush(stdin);
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
-    printf("\nDebug named file");
 
     finalfp=fopen(filename,"wb");
-    printf("\nDebug write 1 file");
     fwrite(final_message,sizeof(char),m,finalfp);
-    printf("\nDebug write 2 file");
     fclose(finalfp);
 }
