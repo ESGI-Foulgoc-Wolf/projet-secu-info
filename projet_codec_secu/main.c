@@ -99,7 +99,7 @@ void get_message(char *message, int *valid_message){
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
     message_fp = fopen(filename,"r+");
-    fgets(message,1000,message_fp);
+    fread(message,sizeof(char),1000,message_fp);
     fclose(message_fp);
     if(strlen(message) > 0){
         *valid_message = 1;
@@ -178,46 +178,27 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
         }
     }
 
-    printf("strlen message : %d", strlen(message)*8 );
-    printf("\nBinary :");
-    for (i = 0; i < strlen(message)*8; i++){
-
-        printf(" %d", binary_message[i]);
-    }
-
     newbinary = malloc(column_nb*sizeof(int));
     do{
-        printf("\nDebug do k : %d", k);
-        printf("\nDebug do l : %d", l);
         newbinary[l] = binary_message[k+4];
         l++;
-        printf("\nDebug do l : %d", l);
         newbinary[l] = binary_message[k+1];
         l++;
-        printf("\nDebug do l : %d", l);
         newbinary[l] = binary_message[k+2];
         l++;
-        printf("\nDebug do l : %d", l);
         newbinary[l] = binary_message[k+3];
         l++;
-        printf("\nDebug do l : %d", l);
         k = k+8;
 
     } while(k < strlen(message)*8);
 
-    printf("\nDebug after while");
     for(j = 0; j < l; j++){
             decrypted_message[j]=newbinary[j];
     }
-    printf("\nDebug after for decrypt");
-    //free(newbinary);
-    printf("\nDebug after free");
 
     for(i = 0; i < column_nb*8/line_nb; i++){
         m = i;
-        printf("\nDebug for convert 1 i = %d", i);
         for(j = 0; j < 8; j++){
-            printf("\nDebug for convert 2 j = %d", i);
             final_message[i]=final_message[i]^decrypted_message[j+8*i];
             if(j!=7) final_message[i] = final_message[i] << 1;
         }
