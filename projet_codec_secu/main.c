@@ -47,6 +47,7 @@ int main(int argc, char **argv){
                         printf("\nVeuillez entrer une matrice et un message valide\n");
                         system("pause");
                     }
+                    break;
             default: printf("Veuillez entrer une valeur valide");
         }
     }while(choice!=0);
