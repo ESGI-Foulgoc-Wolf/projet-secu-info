@@ -41,6 +41,12 @@ int main(int argc, char **argv){
                         system("pause");
                     }
                     break;
+            case 4: if(valid_matrix == 1 && valid_message == 1){
+                        decrypt_message(message, matrix, column_nb, line_nb);
+                    } else {
+                        printf("\nVeuillez entrer une matrice et un message valide\n");
+                        system("pause");
+                    }
             default: printf("Veuillez entrer une valeur valide");
         }
     }while(choice!=0);
@@ -101,6 +107,7 @@ void get_message(char *message, int *valid_message){
     }
 }
 
+
 void hash_message(char *message, char *matrix, int column_nb, int line_nb){
     FILE *finalfp;
     int *binary= NULL;
@@ -134,6 +141,7 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
             l++;
         }
     }
+
     free(binary);
 
     for(i = 0; i < strlen(message)*8/line_nb; i++){
@@ -150,5 +158,79 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
 
     finalfp=fopen(filename,"wb");
     fwrite(final_message,sizeof(char),strlen(message)*8/line_nb,finalfp);
+    fclose(finalfp);
+}
+
+
+void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
+    FILE *finalfp;
+    int *newbinary= NULL;
+    int binary_message[8000]={-1};
+    char decrypted_message[8000]={0};
+    char final_message[8000]={0};
+    char filename[1000];
+    int i = 0, j = 0, k = 0, l = 0, m = 0;
+
+    for(i = 0; i < strlen(message); i++){
+        for(j = 7; j >= 0; j--){
+            binary_message[(8 * i) + (7-j)]=((1 << j) & message[i]) >> j;
+        }
+    }
+
+    printf("strlen message : %d", strlen(message)*8 );
+    printf("\nBinary :");
+    for (i = 0; i < strlen(message)*8; i++){
+
+        printf(" %d", binary_message[i]);
+    }
+
+    newbinary = malloc(column_nb*sizeof(int));
+    do{
+        printf("\nDebug do k : %d", k);
+        printf("\nDebug do l : %d", l);
+        newbinary[l] = binary_message[k+4];
+        l++;
+        printf("\nDebug do l : %d", l);
+        newbinary[l] = binary_message[k+1];
+        l++;
+        printf("\nDebug do l : %d", l);
+        newbinary[l] = binary_message[k+2];
+        l++;
+        printf("\nDebug do l : %d", l);
+        newbinary[l] = binary_message[k+3];
+        l++;
+        printf("\nDebug do l : %d", l);
+        k = k+8;
+
+    } while(k < strlen(message)*8);
+
+    printf("\nDebug after while");
+    for(j = 0; j < l; j++){
+            decrypted_message[j]=newbinary[j];
+    }
+    printf("\nDebug after for decrypt");
+    //free(newbinary);
+    printf("\nDebug after free");
+
+    for(i = 0; i < column_nb*8/line_nb; i++){
+        m = i;
+        printf("\nDebug for convert 1 i = %d", i);
+        for(j = 0; j < 8; j++){
+            printf("\nDebug for convert 2 j = %d", i);
+            final_message[i]=final_message[i]^decrypted_message[j+8*i];
+            if(j!=7) final_message[i] = final_message[i] << 1;
+        }
+    }
+
+    printf("\nVeuillez entrez le nom du fichier a creer : ");
+    fflush(stdin);
+    fgets(filename,1000,stdin);
+    filename[strlen(filename)-1]='\0';
+    printf("\nDebug named file");
+
+    finalfp=fopen(filename,"wb");
+    printf("\nDebug write 1 file");
+    fwrite(final_message,sizeof(char),m,finalfp);
+    printf("\nDebug write 2 file");
     fclose(finalfp);
 }
