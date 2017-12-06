@@ -1,9 +1,10 @@
-/* But du programme : cryptage/décryptage d'un fichier selon une matrice
+/* But du programme : cryptage/dï¿½cryptage d'un fichier selon une matrice
     auteurs : FOULGOC Medhi, WOLF Hugo*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 
 int main(int argc, char **argv){
     int choice;
@@ -11,6 +12,8 @@ int main(int argc, char **argv){
     char matrix[1000];
     char message[1000];
     int column_nb = 0, line_nb = 1;
+    int *remarkable_pos = NULL;
+    int **remarkable_array = NULL;
     do{
         system("cls");
         printf("Bienvenue dans notre programme de cryptage!\n");
@@ -44,7 +47,7 @@ int main(int argc, char **argv){
                     }
                     break;
             case 4: if(valid_matrix == 1 && valid_message == 1){
-                        decrypt_message(message, matrix, column_nb, line_nb);
+                        decrypt_message(message, matrix, remarkable_pos, remarkable_array, column_nb, line_nb);
                     } else {
                         printf("\nVeuillez entrer une matrice et un message valide\n");
                         system("pause");
@@ -56,7 +59,7 @@ int main(int argc, char **argv){
     return 0;
 }
 
-//fonction permettant de récupérer la matrice entrée par l'utilisateur, et de vérifier si elle correspond au format voulu
+//fonction permettant de rï¿½cupï¿½rer la matrice entrï¿½e par l'utilisateur, et de vï¿½rifier si elle correspond au format voulu
 void get_matrix(char *matrix, int *column_nb, int *line_nb, int *valid_matrix){
     FILE *matrix_fp;
     char filecontent[1000];
@@ -93,7 +96,7 @@ void get_matrix(char *matrix, int *column_nb, int *line_nb, int *valid_matrix){
     }
 }
 
-//fonction permettant de récupérer le fichier entré par l'utilisateur
+//fonction permettant de rï¿½cupï¿½rer le fichier entrï¿½ par l'utilisateur
 void get_message(char *message, int *valid_message){
     FILE *message_fp;
     char filename[1000];
@@ -148,10 +151,14 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
             l++;
         }
     }
+    printf("\nDebug BINARYMESSAGE : ");
+    for(j = 0; j < strlen(message)*8; j++){
+      printf("%d ;", binary[j]);
+    }
 
     free(binary);
 
-    //reconversion du message crypté en chars
+    //reconversion du message cryptï¿½ en chars
     for(i = 0; i < strlen(message)*8/line_nb; i++){
         for(j = 0; j < 8; j++){
             final_message[i]=final_message[i]^crypted_message[j+8*i];
@@ -159,7 +166,7 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
         }
     }
 
-    //création du nouveau fichier
+    //crï¿½ation du nouveau fichier
     printf("\nVeuillez entrer le nom du fichier a creer : ");
     fflush(stdin);
     fgets(filename,1000,stdin);
@@ -170,15 +177,19 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
     fclose(finalfp);
 }
 
-//fonction permettant de décrypter le fichier
-void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
+//fonction permettant de dï¿½crypter le fichier
+void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **remarkable_array, int column_nb, int line_nb){
     FILE *finalfp;
     int *newbinary= NULL;
+    int *test = NULL;
     int binary_message[8000]={-1};
     char decrypted_message[8000]={0};
     char final_message[8000]={0};
+    char *get_final_message = NULL;
     char filename[1000];
-    int i = 0, j = 0, k = 0, l = 0, m = 0;
+    int i = 0, j = 0, k = 0, l = 0, m = 0, n = 0;
+    int nb_m = 0;
+    int count_lenght = 0;
 
     //transfert du code binaire des chars dans un tableau
     for(i = 0; i < strlen(message); i++){
@@ -186,27 +197,70 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
             binary_message[(8 * i) + (7-j)]=((1 << j) & message[i]) >> j;
         }
     }
+    /* On alloue la mÃ©moire nÃ©cessaire Ã  la dÃ©termination de l'identitÃ© remarquable */
+    remarkable_array = malloc(sizeof(int)* line_nb);
+    remarkable_pos = malloc(sizeof(int)* line_nb);
+    for(i = 0; i < line_nb; i++){
+      remarkable_array[i] = malloc(sizeof(int)* column_nb);
+    }
+    /* On appelle la fonction de traduction char -> int */
+    translate_matrix(matrix, remarkable_array, column_nb, line_nb);
+
+    do{
+      l = 0;
+      for(i = 0; i < column_nb; i++){
+        for(j = 0; j < line_nb; j++){
+          if(remarkable_array[j][i] == 1 && j == nb_m){
+            for(k = 0; k < line_nb; k++){
+              if(k != nb_m && remarkable_array[k][i] == 0){
+                l++;
+              }
+            }
+          }
+        }
+        if(l == line_nb-1){
+          remarkable_pos[nb_m] = i;
+          nb_m++;
+        }
+      }
+
+    }while (line_nb - (nb_m + 1) >= 0);
+
+    printf("\nPosition identite remarquable :");
+    for(i = 0; i < line_nb; i++){
+      printf(" c%d ;", remarkable_pos[i]+1);
+    }
 
     newbinary = malloc(column_nb*sizeof(int));
-    //décryptage du code binaire
+    //dï¿½cryptage du code binaire
+    printf("\nDebug Before DO_DECRYPT");
+    k = 0;
     do{
-        newbinary[l] = binary_message[k+4];
-        l++;
-        newbinary[l] = binary_message[k+1];
-        l++;
-        newbinary[l] = binary_message[k+2];
-        l++;
-        newbinary[l] = binary_message[k+3];
-        l++;
-        k = k+8;
+      printf("\nDebug DO_DECRYPT");
+      m = 0;
+        for(int l = 0; l < line_nb; l++){
+          m = k + remarkable_pos[l];
+          printf("\nDebug FOR_DECRYPT %d", m);
+          newbinary[l] = binary_message[m];
+          n++;
+        }
+        k = k + 8;
 
     } while(k < strlen(message)*8);
 
-    for(j = 0; j < l; j++){
+    for(j = 0; j < n; j++){
             decrypted_message[j]=newbinary[j];
     }
+    printf("\nDebug DECRYPTEDMESSAGE : ");
+    for(j = 0; j < n; j++){
+      printf("%d ;", decrypted_message[j]);
+    }
+    printf("\nDebug BINARYMESSAGE : ");
+    for(j = 0; j < strlen(message)*8; j++){
+      printf("%d ;", newbinary[j]);
+    }
 
-    //reconversion du message crypté en chars
+    //reconversion du message cryptï¿½ en chars
     for(i = 0; i < column_nb*8/line_nb; i++){
         m = i;
         for(j = 0; j < 8; j++){
@@ -215,13 +269,72 @@ void decrypt_message(char *message, char *matrix, int column_nb, int line_nb){
         }
     }
 
-    //création du nouveau fichier
+    for(i = 0; i < strlen(final_message); i++){
+      if(final_message[i] != NULL){
+        count_lenght++;
+      }
+    }
+    get_final_message = malloc(sizeof(char)*count_lenght);
+
+    for(i = 0; i < count_lenght; i++){
+      get_final_message[i] = final_message[i];
+    }
+
+
+    //crï¿½ation du nouveau fichier
     printf("\nVeuillez entrer le nom du fichier a creer : ");
     fflush(stdin);
     fgets(filename,1000,stdin);
     filename[strlen(filename)-1]='\0';
 
     finalfp=fopen(filename,"wb");
-    fwrite(final_message,sizeof(char),m,finalfp);
+    fwrite(get_final_message,sizeof(char),m,finalfp);
     fclose(finalfp);
 }
+
+void translate_matrix(char *matrix, int **remarkable_array, int column_nb, int line_nb){
+  int i;
+  int j = 0;
+  int k = 0;
+  /* On lit le pointeur matrix et on le transforme en tableau de int en supprimant les espaces*/
+  for(i = 0; i < column_nb*line_nb+(line_nb-1); i++){
+    if(matrix[i] == 32){
+      j++;
+      k = 0;
+    }
+    else{
+      if(i < 8){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+      if(i > 8 && i < 17){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+      if(i > 17 && i < 26){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+      if(i > 26 && i < 35){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+    }
+  }
+  /* On transforme les ASCII en vraie valeur dÃ©cimale 0 ou 1*/
+  for(i = 0; i < line_nb; i++){
+    printf("\n");
+    for(j = 0; j < column_nb; j++){
+      remarkable_array[i][j] = (remarkable_array[i][j] == 48) ? 0 : 1;
+      printf("%d", remarkable_array[i][j]);
+    }
+  }
+}
+
+/*void get_remarkable_identity(char *matrix, int *remarkable_pos, int **remarkable_array, int column_nb, int line_nb){
+  int i = 0;
+  int j;
+  int k;
+  int l;
+
+}*/
