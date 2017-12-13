@@ -151,9 +151,12 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
             l++;
         }
     }
-    printf("\nDebug BINARYMESSAGE : ");
-    for(j = 0; j < strlen(message)*8; j++){
-      printf("%d ;", binary[j]);
+    printf("\nDebug BINARYMESSAGE : \nDebug BINARYMESSAGE strlenOfMessage : %d\n", strlen(message));
+    for(j = 0; j < (strlen(message)*8)*2; j++){
+      if(j % 8 == 0){
+        printf("\n");
+      }
+      printf("%d", crypted_message[j]);
     }
 
     free(binary);
@@ -187,7 +190,7 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
     char final_message[8000]={0};
     char *get_final_message = NULL;
     char filename[1000];
-    int i = 0, j = 0, k = 0, l = 0, m = 0, n = 0;
+    int i = 0, j = 0, k = 0, l = 0, m = 0, n = 0, p = 0;
     int nb_m = 0;
     int count_lenght = 0;
 
@@ -234,23 +237,31 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
     newbinary = malloc(column_nb*sizeof(int));
     //d�cryptage du code binaire
     printf("\nDebug Before DO_DECRYPT");
+
     k = 0;
+    p = 0;
     do{
+      for(j = 0; j < column_nb; j++){
+          newbinary[j]=0;
+      }
       printf("\nDebug DO_DECRYPT");
       m = 0;
-        for(int l = 0; l < line_nb; l++){
-          m = k + remarkable_pos[l];
-          printf("\nDebug FOR_DECRYPT %d", m);
-          newbinary[l] = binary_message[m];
-          n++;
-        }
-        k = k + 8;
+      n = 0;
+      for(int l = 0; l < line_nb; l++){
+        m = k + remarkable_pos[l];
+        printf("\nDebug FOR_DECRYPT %d", m);
+        newbinary[l] = binary_message[m];
+        n++;
+      }
+      k = k + 8;
+      for(j = 0; j < n; j++){
+              decrypted_message[p]=newbinary[j];
+              p++;
+      }
 
     } while(k < strlen(message)*8);
 
-    for(j = 0; j < n; j++){
-            decrypted_message[j]=newbinary[j];
-    }
+
     printf("\nDebug DECRYPTEDMESSAGE : ");
     for(j = 0; j < n; j++){
       printf("%d ;", decrypted_message[j]);
