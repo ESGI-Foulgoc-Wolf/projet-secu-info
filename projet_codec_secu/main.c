@@ -180,6 +180,46 @@ void hash_message(char *message, char *matrix, int column_nb, int line_nb){
     fclose(finalfp);
 }
 
+// Transformer la matrice de char => int
+void translate_matrix(char *matrix, int **remarkable_array, int column_nb, int line_nb){
+  int i;
+  int j = 0;
+  int k = 0;
+  /* On lit le pointeur matrix et on le transforme en tableau de int en supprimant les espaces*/
+  for(i = 0; i < column_nb*line_nb+(line_nb-1); i++){
+    if(matrix[i] == 32){
+      j++;
+      k = 0;
+    }
+    else{
+      if(i < 8){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+      if(i > 8 && i < 17){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+      if(i > 17 && i < 26){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+      if(i > 26 && i < 35){
+        remarkable_array[j][k] = matrix[i];
+        k++;
+      }
+    }
+  }
+  /* On transforme les ASCII en vraie valeur décimale 0 ou 1*/
+  for(i = 0; i < line_nb; i++){
+    printf("\n");
+    for(j = 0; j < column_nb; j++){
+      remarkable_array[i][j] = (remarkable_array[i][j] == 48) ? 0 : 1;
+      printf("%d", remarkable_array[i][j]);
+    }
+  }
+}
+
 //fonction permettant de d�crypter le fichier
 void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **remarkable_array, int column_nb, int line_nb){
     FILE *finalfp;
@@ -209,19 +249,31 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
     /* On appelle la fonction de traduction char -> int */
     translate_matrix(matrix, remarkable_array, column_nb, line_nb);
 
+    printf("\nDebug matrice1\n");
+    // Récupération de l'identité remarquable
     do{
-      l = 0;
+      printf("Debug do\n");
+      //system("pause");
       for(i = 0; i < column_nb; i++){
+        printf("Debug idrem1 : %d \n", i);
+        //system("pause");
+        l = 0;
         for(j = 0; j < line_nb; j++){
+          printf("Debug idrem2 : %d \n", j);
+          //system("pause");
           if(remarkable_array[j][i] == 1 && j == nb_m){
             for(k = 0; k < line_nb; k++){
+              printf("Debug idrem3 : %d \n", k);
+              //system("pause");
               if(k != nb_m && remarkable_array[k][i] == 0){
                 l++;
+                printf("Debug idrem3 L : %d \n", l);
               }
             }
           }
         }
         if(l == line_nb-1){
+          printf("Debug idrem4");
           remarkable_pos[nb_m] = i;
           nb_m++;
         }
@@ -278,44 +330,7 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
     fclose(finalfp);
 }
 
-void translate_matrix(char *matrix, int **remarkable_array, int column_nb, int line_nb){
-  int i;
-  int j = 0;
-  int k = 0;
-  /* On lit le pointeur matrix et on le transforme en tableau de int en supprimant les espaces*/
-  for(i = 0; i < column_nb*line_nb+(line_nb-1); i++){
-    if(matrix[i] == 32){
-      j++;
-      k = 0;
-    }
-    else{
-      if(i < 8){
-        remarkable_array[j][k] = matrix[i];
-        k++;
-      }
-      if(i > 8 && i < 17){
-        remarkable_array[j][k] = matrix[i];
-        k++;
-      }
-      if(i > 17 && i < 26){
-        remarkable_array[j][k] = matrix[i];
-        k++;
-      }
-      if(i > 26 && i < 35){
-        remarkable_array[j][k] = matrix[i];
-        k++;
-      }
-    }
-  }
-  /* On transforme les ASCII en vraie valeur décimale 0 ou 1*/
-  for(i = 0; i < line_nb; i++){
-    printf("\n");
-    for(j = 0; j < column_nb; j++){
-      remarkable_array[i][j] = (remarkable_array[i][j] == 48) ? 0 : 1;
-      printf("%d", remarkable_array[i][j]);
-    }
-  }
-}
+
 
 /*void get_remarkable_identity(char *matrix, int *remarkable_pos, int **remarkable_array, int column_nb, int line_nb){
   int i = 0;
