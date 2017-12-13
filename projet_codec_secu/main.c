@@ -236,20 +236,16 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
 
     newbinary = malloc(column_nb*sizeof(int));
     //d�cryptage du code binaire
-    printf("\nDebug Before DO_DECRYPT");
-
     k = 0;
     p = 0;
     do{
       for(j = 0; j < column_nb; j++){
           newbinary[j]=0;
       }
-      printf("\nDebug DO_DECRYPT");
       m = 0;
       n = 0;
       for(int l = 0; l < line_nb; l++){
         m = k + remarkable_pos[l];
-        printf("\nDebug FOR_DECRYPT %d", m);
         newbinary[l] = binary_message[m];
         n++;
       }
@@ -260,17 +256,6 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
       }
 
     } while(k < strlen(message)*8);
-
-
-    printf("\nDebug DECRYPTEDMESSAGE : ");
-    for(j = 0; j < n; j++){
-      printf("%d ;", decrypted_message[j]);
-    }
-    printf("\nDebug BINARYMESSAGE : ");
-    for(j = 0; j < strlen(message)*8; j++){
-      printf("%d ;", newbinary[j]);
-    }
-
     //reconversion du message crypt� en chars
     for(i = 0; i < column_nb*8/line_nb; i++){
         m = i;
