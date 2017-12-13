@@ -280,16 +280,6 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
         }
     }
 
-    for(i = 0; i < strlen(final_message); i++){
-      if(final_message[i] != NULL){
-        count_lenght++;
-      }
-    }
-    get_final_message = malloc(sizeof(char)*count_lenght);
-
-    for(i = 0; i < count_lenght; i++){
-      get_final_message[i] = final_message[i];
-    }
 
 
     //cr�ation du nouveau fichier
@@ -299,7 +289,7 @@ void decrypt_message(char *message, char *matrix, int *remarkable_pos, int **rem
     filename[strlen(filename)-1]='\0';
 
     finalfp=fopen(filename,"wb");
-    fwrite(get_final_message,sizeof(char),m,finalfp);
+    fwrite(final_message,sizeof(char),m,finalfp);
     fclose(finalfp);
 }
 
