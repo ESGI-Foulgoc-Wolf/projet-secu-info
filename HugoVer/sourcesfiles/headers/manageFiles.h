@@ -1,0 +1,4 @@
+#ifndef MANAGEFILES_H_INCLUDED
+#define MANAGEFILES_H_INCLUDED
+
+#endif

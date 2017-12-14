@@ -1,0 +1,37 @@
+# depslib dependency file v1.0
+1511885288 source:d:\cours esgi\2e année\sécurité informatique\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1511990830 source:c:\users\medhji-pc\desktop\projet-secu-info\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1511992454 source:d:\cours esgi\2e année\sécurité informatique\projetcodec\projet-secu-info\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1512752966 source:c:\users\medhi\desktop\projet-secu-info\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1513195829 source:c:\users\medhji-pc\desktop\projet-secu-info-master\projet-secu-info\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
+1513207147 source:c:\users\metro\desktop\projet-secu-info-master\projet_codec_secu\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+
